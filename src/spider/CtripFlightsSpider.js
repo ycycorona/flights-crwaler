@@ -17,23 +17,24 @@ module.exports = class CtripFlightsPriceSpider {
         if (url.match(/api\/\w+\/products/)) {
           // 航班信息主数据接口
           if (response.status() === 200) {
-
             resolve(await response.text())
           }
         }
       })
-      page.goto(`http://flights.ctrip.com/itinerary/oneway/${flightLine[0]}-${flightLine[1]}?date=${date}`, {
+      // 航班信息页面地址
+      const url = `http://flights.ctrip.com/itinerary/oneway/${flightLine[0]}-${flightLine[1]}?date=${date}`
+      page.goto(url, {
         timeout: 30000,
       }).catch(e => {
         resolve(null)
-        logger.error(e)
+        logger.error(`打开${url}失败`, e)
       })
     })
 
     if (productData) {
-      logger.info('获取到product response')
+      logger.info('获取到product接口信息', date, flightLine)
     } else {
-      logger.info('页面加载完成')
+      logger.error('获取到product接口信息失败', date, flightLine)
     }
 
     //const pageDocStr = await page.mainFrame().content()
@@ -48,7 +49,7 @@ module.exports = class CtripFlightsPriceSpider {
     const fileName = `[${flightLine[0]}-${flightLine[1]}][date=${date}][${nowTime}].json`
     fs.writeFile(`./test/json/${fileName}`, productData, (err) => {
       if (err) logger.error(`写入 ${fileName} 失败`, err)
-      logger.info(`写入 ${fileName} 成功`);
+      logger.info(`保存productData,写入 ${fileName} 成功`);
     })
     await page.evaluate(() => window.stop());
     await page.waitFor(1000)
