@@ -10,5 +10,10 @@ module.exports = {
       dataList.push(dateStart.add(i, 'day').format('YYYY-MM-DD'))
     }
     return dataList
+  },
+  getTextNode(obj) {
+    return obj.contents().filter((index, content) => {
+      return content.nodeType === 3
+    })
   }
 }

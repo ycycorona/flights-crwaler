@@ -18,10 +18,11 @@ module.exports = async () => {
     const spider = new CtripFlightsPriceSpider(config.ctripFlightsPriceSpider, browser)
     const dateList = util.getDateList(dateStart, dateEnd)
 
-    for (const date of dateList) {
-      await spider.getPage(date, flightLines[0])
+    for (const flightLine of flightLines) {
+      for (const date of dateList) {
+        await spider.getPage(date, flightLine)
+      }
     }
-
     await browser.close()
   } catch (e) {
     logger.error(e)

@@ -1,0 +1,24 @@
+{
+  "data": {
+    "version": "V2",
+    "error": {
+      "code": "103",
+      "message": "不通航"
+    },
+    "routeList": null,
+    "selectedRouteList": null,
+    "recommendData": null,
+    "transitCities": null,
+    "transitPoints": null,
+    "basicModelData": null,
+    "couponDesc": null,
+    "highFrequencyConfig": null,
+    "log": {},
+    "publicGiftIds": null,
+    "roundNear": false,
+    "roundNearsTransports": null
+  },
+  "status": 0,
+  "msg": "success",
+  "transactionId": "2e957749FDOX4a398f5dbd3a1777c720"
+}

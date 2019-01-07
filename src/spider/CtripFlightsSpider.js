@@ -2,6 +2,7 @@ const logger = require('../common/logger')(__filename)
 const fs = require('fs')
 const cheerio = require('cheerio')
 const dayjs = require('dayjs')
+const getTextNode = require('../util').getTextNode
 
 module.exports = class CtripFlightsPriceSpider {
   constructor(options, browser) {
@@ -10,30 +11,84 @@ module.exports = class CtripFlightsPriceSpider {
 
   async getPage(date, flightLine) {
     const page = await this.browser.newPage()
-    await page.goto(`http://flights.ctrip.com/itinerary/oneway/${flightLine[0]}-${flightLine[1]}?date=${date}`, {
-      timeout: 30000,
-    }).catch(e => {
-      logger.error(e)
+    const productData = await new Promise((resolve, reject) => {
+      page.on('response', async (response) => {
+        const url = response.url()
+        if (url.match(/api\/\w+\/products/)) {
+          // 航班信息主数据接口
+          if (response.status() === 200) {
+
+            resolve(await response.text())
+          }
+        }
+      })
+      page.goto(`http://flights.ctrip.com/itinerary/oneway/${flightLine[0]}-${flightLine[1]}?date=${date}`, {
+        timeout: 30000,
+      }).catch(e => {
+        resolve(null)
+        logger.error(e)
+      })
     })
-    const pageDocStr = await page.mainFrame().content()
-    const nowTime = dayjs().format('YYYY-MM-dd HH:mm:ss')
+
+    if (productData) {
+      logger.info('获取到product response')
+    } else {
+      logger.info('页面加载完成')
+    }
+
+    //const pageDocStr = await page.mainFrame().content()
+    // 保存文件存档
+/*    const nowTime = dayjs().format('YYYY-MM-DD-HH-mm-ss')
     const fileName = `[${flightLine[0]}-${flightLine[1]}][date=${date}][${nowTime}].html`
     fs.writeFile(`./test/${fileName}`, pageDocStr, (err) => {
       if (err) logger.error(`写入 ${fileName} 失败`, err)
       logger.all(`写入 ${fileName} 成功`);
+    })*/
+    const nowTime = dayjs().format('YYYY-MM-DD-HH-mm-ss')
+    const fileName = `[${flightLine[0]}-${flightLine[1]}][date=${date}][${nowTime}].json`
+    fs.writeFile(`./test/json/${fileName}`, productData, (err) => {
+      if (err) logger.error(`写入 ${fileName} 失败`, err)
+      logger.info(`写入 ${fileName} 成功`);
     })
+    await page.evaluate(() => window.stop());
+    await page.waitFor(1000)
     await page.close()
+    return productData
   }
 
   extraInfo(docStr) {
-    const infoObj = {}
+    const flightInfoList = []
     const $ = cheerio.load(docStr)
     const $searchresultContent = $('.searchresult_content')
     const $flightListDom = $('.search_box.search_box_tag.search_box_light.Label_Flight', $searchresultContent)
     if ($flightListDom.length === 0) {
       logger.info(`没有提取到直达航班`);
+      return []
     }
-    infoObj.text = $flightListDom.text()
-    return infoObj
+    $flightListDom.each(function (index, ele) {
+      const infoObj = {}
+      // 航空公司名称
+      const $airlineCompanyDom = $(this).find('.pubFlights-logo').parent()
+      infoObj.airlineCompany = getTextNode($airlineCompanyDom).text()
+      // 航班号
+      infoObj.flightNo = $(this).find('.pubFlights-logo').parent().next().text()
+      // 机型
+      infoObj.planeType = $(this).find('.logo').children().eq(1).text().trim()
+      // 起飞时间
+      infoObj.startTime = $(this).find('.right strong.time').text().trim()
+      // 起飞机场
+      infoObj.startAirport = $(this).find('.right .airport').text().trim()
+      // 降落时间
+      infoObj.startTime = $(this).find('.left strong.time').text().trim()
+      // 降落机场
+      infoObj.startAirport = $(this).find('.left .airport').text().trim()
+      // 价格
+      const $priceDom = $(this).find('.price dfn').parent()
+      infoObj.price = getTextNode($priceDom).text()
+
+      flightInfoList.push(infoObj)
+    })
+
+    return flightInfoList
   }
 }
