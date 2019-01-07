@@ -10,12 +10,15 @@ const CtripFlightsPriceSpider = require('./CtripFlightsSpider')
 module.exports = async () => {
   let error = null
   try {
-    const {dateStart, dateEnd} = config.ctripFlightsPriceSpider.params
+    const {dateStart, dateEnd, flightLines} = config.ctripFlightsPriceSpider.params
     const browser = await getBrowser(config.chromeOptions)
     const spider  = new CtripFlightsPriceSpider(config.ctripFlightsPriceSpider, browser)
     const dateList = util.getDateList(dateStart, dateEnd)
-    logger.debug(dateList)
-    //await spider.getPage()
+
+    for (const date of dateList) {
+      await spider.getPage(date, flightLines[0])
+    }
+
     await browser.close()
   } catch (e) {
     logger.error(e)

@@ -16,8 +16,8 @@ module.exports = {
     params: {
       baseUrl: 'http://flights.ctrip.com/itinerary/',
       dateStart: '2019-01-07',
-      dateEnd: '2019-01-14',
-      flight: [['tao', 'cgo']]
+      dateEnd: '2019-01-30',
+      flightLines: [['tao', 'cgo']]
     }
   }
 }
