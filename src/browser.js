@@ -1,7 +1,6 @@
 const path = require('path')
 const puppeteer = require('puppeteer')
-const logger = require('log4js').getLogger()
-logger.addContext('filePath', path.relative(process.cwd(), __filename))
+const logger = require('./common/logger')(__filename)
 
 module.exports = async (chromeOptions) => {
   const browser =  await puppeteer.launch(chromeOptions).catch(err => {

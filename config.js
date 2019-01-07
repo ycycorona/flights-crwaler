@@ -6,7 +6,7 @@ module.exports = {
   chromeOptions: {
     ignoreHTTPSErrors: true,
     headless: true,
-    args: ['--proxy-server=socks5://127.0.0.1:10091'],
+    //args: ['--proxy-server=socks5://127.0.0.1:10099'],
     defaultViewport: {
       width: 1920,
       height: 1080
