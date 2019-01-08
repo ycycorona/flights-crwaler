@@ -3,15 +3,12 @@ const logger = require('../common/logger')(__filename)
 const getBrowser = require('../browser')
 const util = require('../util')
 const queue = require('async/queue')
-
 const config = require('../../config')
 
 
 const CtripFlightsPriceSpider = require('./CtripFlightsSpider')
 
-module.exports = async (config) => {
-  console.log(process.env.NODE_ENV)
-  return
+module.exports = async () => {
   let error = null
   try {
     const {
@@ -34,7 +31,7 @@ module.exports = async (config) => {
       if (! (getPageRes && getPageRes.flag)) {
         return false
       }
-      const flightInfo = task.spider.extraInfoFromJson(getPageRes)
+      const extraRes = task.spider.extraInfoFromJson(getPageRes)
       return true
     }, 5)
     taskQueue.drain = async () => {

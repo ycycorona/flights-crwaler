@@ -1,12 +1,8 @@
 module.exports = {
-  useProxy: true,
-  proxyProtocol: 'SOCKS5',
-  proxyHost: '127.0.0.1',
-  proxyPort: '10091',
   chromeOptions: {
     ignoreHTTPSErrors: true,
     headless: true,
-    args: ['--proxy-server=socks5://127.0.0.1:10091'],
+    //args: ['--proxy-server=socks5://127.0.0.1:10099'],
     defaultViewport: {
       width: 1920,
       height: 1080
@@ -16,10 +12,10 @@ module.exports = {
     params: {
       baseUrl: 'https://flights.ctrip.com/itinerary/',
       dateStart: '2019-01-10',
-      dateEnd: '2019-01-10',
+      dateEnd: '2019-02-10',
       flightLines: [
         ['hrb', 'tao'],
-/*        ['tao', 'hrb'],
+        ['tao', 'hrb'],
         ['zha', 'tao'],
         ['tao', 'zha'],
         ['kry', 'tao'],
@@ -76,7 +72,7 @@ module.exports = {
         ['nng', 'cgq'],
         ['cgq', 'nng'],
         ['hak', 'cgq'],
-        ['cgq', 'hak']*/]
+        ['cgq', 'hak']]
 
     }
   }

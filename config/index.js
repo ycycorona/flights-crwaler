@@ -10,8 +10,7 @@ if (envMap[NODE_ENV]) {
   configEnv = require(`./config.${envMap[NODE_ENV]}.js`)
 }
 
-const config = _.merge(configDefault, configEnv)
+module.exports = _.merge(configDefault, configEnv)
 
-console.log(config)
 
 

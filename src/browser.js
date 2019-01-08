@@ -6,7 +6,6 @@ module.exports = async (chromeOptions) => {
   const browser =  await puppeteer.launch(chromeOptions).catch(err => {
     logger.error('puppeteer实例启动失败', err)
   })
-  logger.error('browser', browser)
   if (browser) {
     logger.info('puppeteer实例启动成功')
     browser.on('disconnected', () => {

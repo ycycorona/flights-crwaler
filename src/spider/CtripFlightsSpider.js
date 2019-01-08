@@ -58,11 +58,13 @@ module.exports = class CtripFlightsPriceSpider {
       logger.info('获取到product接口信息', date, flightLine)
       const nowTime = dayjs().format('YYYY-MM-DD-HH-mm-ss') // 获取当前时间
       fileName = `[${flightLine[0]}-${flightLine[1]}][date=${date}][${nowTime}].json`
+/*
+      fileName = `[${flightLine[0]}-${flightLine[1]}][date=${date}][${nowTime}].json`
       // 本地储存获取到的json
       fs.writeFile(`./test/json/${fileName}`, productData, (err) => {
         if (err) logger.error(`写入 ${fileName} 失败`, err)
         logger.info(`保存productData,写入 ${fileName} 成功`);
-      })
+      })*/
     } else {
       flag = false
       logger.error('获取到product接口信息失败', date, flightLine)
@@ -142,6 +144,13 @@ module.exports = class CtripFlightsPriceSpider {
       }
     }
 
+    if (flag) {
+      const nowTime = dayjs().format('YYYY-MM-DD-HH-mm-ss') // 获取当前时间
+      fs.writeFile(`./test/json/${getPageRes.fileName}`, JSON.stringify(flightInfoList), (err) => {
+        if (err) logger.error(`写入 ${getPageRes.fileName} 失败`, err)
+        logger.info(`保存flightInfoList,写入 ${getPageRes.fileName} 成功`);
+      })
+    }
 
     return {flag, flightInfoList}
   }
