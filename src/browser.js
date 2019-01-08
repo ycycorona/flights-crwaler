@@ -4,8 +4,9 @@ const logger = require('./common/logger')(__filename)
 
 module.exports = async (chromeOptions) => {
   const browser =  await puppeteer.launch(chromeOptions).catch(err => {
-    logger.error('puppeteer实例启动失败')
+    logger.error('puppeteer实例启动失败', err)
   })
+  logger.error('browser', browser)
   if (browser) {
     logger.info('puppeteer实例启动成功')
     browser.on('disconnected', () => {
@@ -24,7 +25,7 @@ module.exports = async (chromeOptions) => {
           }
         }*/
         if (! flag) {
-          page.close()
+          await page.close()
           logger.debug(`关闭广告等弹出页面！`)
         }
       }

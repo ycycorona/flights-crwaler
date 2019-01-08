@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "node src/dev.js"
+    "test": "node test/dayjs-test.js",
+    "dev": "node src/dev.js",
+    "start": "node src/start.js"
   },
   "author": "ycy",
   "license": "MIT",
@@ -16,6 +17,7 @@
     "dayjs": "^1.7.8",
     "debug": "^4.1.1",
     "filenamify": "^2.1.0",
+    "lodash": "^4.17.11",
     "log4js": "^3.0.6",
     "proxy-agent": "^3.0.3",
     "puppeteer": "^1.11.0",

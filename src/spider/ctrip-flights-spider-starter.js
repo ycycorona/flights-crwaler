@@ -1,12 +1,17 @@
 const path = require('path')
 const logger = require('../common/logger')(__filename)
-const config = require('../../config.js')
 const getBrowser = require('../browser')
 const util = require('../util')
+const queue = require('async/queue')
+
+const config = require('../../config')
+
 
 const CtripFlightsPriceSpider = require('./CtripFlightsSpider')
 
-module.exports = async () => {
+module.exports = async (config) => {
+  console.log(process.env.NODE_ENV)
+  return
   let error = null
   try {
     const {
@@ -15,19 +20,44 @@ module.exports = async () => {
       flightLines
     } = config.ctripFlightsPriceSpider.params
     const browser = await getBrowser(config.chromeOptions)
+/*    if (!browser) {
+      return false
+    }*/
     const spider = new CtripFlightsPriceSpider(config.ctripFlightsPriceSpider, browser)
     const dateList = util.getDateList(dateStart, dateEnd)
 
-    const taskParamsList = []
-    for (const flightLine of flightLines) {
-      for (const date of dateList) {
-        taskParamsList.push([date, flightLine])
-        await spider.getPage(date, flightLine)
+    const taskQueue = queue(async (task) => {
+      logger.info('当前任务并发数',taskQueue.running())
+      logger.info('待执行任务数',taskQueue.length())
+      const getPageRes = await task.spider.getPage(task.date, task.flightLine)
+      // 判断是否成功返回数据
+      if (! (getPageRes && getPageRes.flag)) {
+        return false
       }
+      const flightInfo = task.spider.extraInfoFromJson(getPageRes)
+      return true
+    }, 5)
+    taskQueue.drain = async () => {
+      logger.info('all items have been processed');
+      await browser.close()
+    }
+    taskQueue.error = function(error, task) {
+      logger.all('onError', error);
     }
 
-
-    await browser.close()
+    for (const flightLine of flightLines) {
+      for (const date of dateList) {
+        // await spider.getPage(date, flightLine)
+        taskQueue.push({spider, date, flightLine}, function (err, res) {
+          if (err) {
+            logger.error('任务失败', err)
+          } else {
+            logger.info('任务成功', err, res)
+          }
+        })
+      }
+    }
+    logger.info(`队列长度${taskQueue.length()}`)
   } catch (e) {
     logger.error(e)
     error = e

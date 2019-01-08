@@ -5,3 +5,6 @@ const diff = day_2.diff(day_1, 'day')
 
 console.log(day_1.add(1, 'day').format('YYYY-MM-DD'))
 console.log(diff)
+console.log(process.env.NODE_ENV)
+
+process.exit(0)
