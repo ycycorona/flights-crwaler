@@ -10,23 +10,51 @@ const CtripFlightsPriceSpider = require('./CtripFlightsSpider')
 
 module.exports = async () => {
   let error = null
+
   try {
     const {
       dateStart,
       dateEnd,
       flightLines
     } = config.ctripFlightsPriceSpider.params
+    logger.info(flightLines, dateStart, dateEnd)
+    return
     const browser = await getBrowser(config.chromeOptions)
-/*    if (!browser) {
-      return false
-    }*/
+
     const spider = new CtripFlightsPriceSpider(config.ctripFlightsPriceSpider, browser)
     const dateList = util.getDateList(dateStart, dateEnd)
 
     const taskQueue = queue(async (task) => {
       logger.info('当前任务并发数',taskQueue.running())
       logger.info('待执行任务数',taskQueue.length())
-      const getPageRes = await task.spider.getPage(task.date, task.flightLine)
+      //const getPageRes = await task.spider.getPage(task.date, task.flightLine)
+
+      const url = 'http://flights.ctrip.com/itinerary/api/12808/products'
+      const reqData = {
+        "flightWay": "Oneway",
+        "classType": "ALL",
+        "hasChild": false,
+        "hasBaby": false,
+        "searchIndex": 1,
+        "airportParams": [{
+          "dcity": "bhy",
+          "acity": "sha",
+          "dcityname": "北海",
+          "acityname": "上海",
+          "date": "2019-01-10",
+          "aport": "",
+          "aportname": ""
+        }],
+        "army": false,
+      }
+      reqData.airportParams.dcity = task.flightLine[0]
+      reqData.airportParams.acity = task.flightLine[1]
+      reqData.airportParams.date = task.date
+      const headers = {
+        'Referer': `http://flights.ctrip.com/itinerary/oneway/${task.flightLine[0]}-${task.flightLine[1]}?date=${task.date}`,
+        'Origin': 'http://flights.ctrip.com',
+      }
+      const getPageRes = await task.spider.getProduct(task.date, task.flightLine, url, headers, reqData)
       // 判断是否成功返回数据
       if (! (getPageRes && getPageRes.flag)) {
         return false
@@ -34,6 +62,7 @@ module.exports = async () => {
       const extraRes = task.spider.extraInfoFromJson(getPageRes)
       return true
     }, 5)
+
     taskQueue.drain = async () => {
       logger.info('all items have been processed');
       await browser.close()

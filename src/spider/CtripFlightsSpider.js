@@ -1,6 +1,7 @@
 const logger = require('../common/logger')(__filename)
 const fs = require('fs')
 const cheerio = require('cheerio')
+const axios = require('../common/request/simulate-browser-axios')
 const dayjs = require('dayjs')
 const getTextNode = require('../util').getTextNode
 
@@ -9,13 +10,83 @@ module.exports = class CtripFlightsPriceSpider {
     this.browser = browser
     this.name = 'CtripFlightsPriceSpider'
   }
-  async sayName() {
+
+  // 获取请求token
+  async getAjaxHeader(date, flightLine) {
+    let flag = true
+    let fileName
     const page = await this.browser.newPage().catch(err => {
       logger.error('创建新页面失败', err)
+      flag = false
     })
-    return !!page
-  }
 
+    // await page.setRequestInterception(true);
+
+    const productRequestBody = await new Promise((resolve, reject) => {
+      page.on('response', async (response) => {
+        const url = response.url()
+        if (url.match(/api\/\w+\/products/)) {
+          // 航班信息主数据接口
+          if (response.status() === 200) {
+            resolve(response.request())
+          } else {
+            resolve(null)
+            logger.error(`${url}页面json获取失败`)
+          }
+        } else {
+
+        }
+      })
+      page.on('requestfailed', (request) => {
+        const url = request.url()
+        if (url.match(/api\/\w+\/products/)) {
+          resolve(null)
+        } else {
+
+        }
+      })
+
+      page.on('requestfinished', (request) => {
+        const url = request.url()
+        if (url.match(/api\/\w+\/products/)) {
+          logger.debug(request.headers())
+        } else {
+
+        }
+      })
+
+      page.on('request', async (request) => {
+        const url = request.url()
+        if (url.match(/api\/\w+\/products/)) {
+
+        } else {
+
+        }
+      })
+      // 航班信息页面地址
+      const url = `http://flights.ctrip.com/itinerary/oneway/${flightLine[0]}-${flightLine[1]}?date=${date}`
+      page.goto(url, {
+        timeout: 30000,
+      }).catch(e => {
+        flag = false
+        logger.error(`打开${url}失败`, e)
+      })
+    })
+
+    if (productRequestBody) {
+      logger.info(productRequestBody)
+    } else {
+      flag = false
+    }
+    // 强制停止页面
+    await page.evaluate(() => window.stop());
+    // await page.waitFor(1000)
+    await page.close()
+    return {
+      flag,
+      productRequestBody
+    }
+  }
   /**
    * 获取页面 获取json
    * @param date
@@ -38,7 +109,7 @@ module.exports = class CtripFlightsPriceSpider {
             resolve(await response.text())
           } else {
             resolve(null)
-            logger.error(`${url}页面json解析失败`)
+            logger.error(`${url}页面json获取失败`)
           }
         } else {
 
@@ -49,7 +120,6 @@ module.exports = class CtripFlightsPriceSpider {
       page.goto(url, {
         timeout: 30000,
       }).catch(e => {
-        resolve(null)
         logger.error(`打开${url}失败`, e)
       })
     })
@@ -57,7 +127,7 @@ module.exports = class CtripFlightsPriceSpider {
     if (productData) {
       logger.info('获取到product接口信息', date, flightLine)
       const nowTime = dayjs().format('YYYY-MM-DD-HH-mm-ss') // 获取当前时间
-      fileName = `[${flightLine[0]}-${flightLine[1]}][date=${date}][${nowTime}].json`
+      fileName = `[${flightLine[0]}-${flightLine[1]}][date=${date}][${nowTime}]`
 /*
       fileName = `[${flightLine[0]}-${flightLine[1]}][date=${date}][${nowTime}].json`
       // 本地储存获取到的json
@@ -88,8 +158,46 @@ module.exports = class CtripFlightsPriceSpider {
       productData
     }
   }
-  async getProduct() {
+  async getProduct(date, flightLine, baseUrl, headers, requestData) {
+    let flag = true
+    let fileName
+    const productData = await new Promise((resolve, reject) => {
 
+      axios({
+        method: 'POST',
+        url: baseUrl,
+        data: requestData,
+        headers
+      })
+        .then(function(response) {
+          if (!(response.data.status === 0 && response.data.data.error===null)) {
+            flag = false
+            logger.error('直接请求getProduct失败', response.data.data.error || '')
+            resolve(null)
+          } else {
+            resolve(response.data)
+          }
+        })
+        .catch((err) => {
+          resolve(null)
+          logger.error('直接请求getProduct失败', err)
+        })
+    })
+
+    if (productData) {
+      logger.info('获取到product接口信息', date, flightLine)
+      const nowTime = dayjs().format('YYYY-MM-DD-HH-mm-ss') // 获取当前时间
+      fileName = `[${flightLine[0]}-${flightLine[1]}][date=${date}][${nowTime}]`
+    } else {
+      flag = false
+      logger.error('获取到product接口信息失败', date, flightLine)
+    }
+
+    return {
+      flag,
+      fileName,
+      productData
+    }
   }
   /**
    * 从ajax JSON提取数据
@@ -100,11 +208,16 @@ module.exports = class CtripFlightsPriceSpider {
     let flag = true
     const flightInfoList = []
     let jsonObj
-    try{
-      jsonObj = JSON.parse(getPageRes.productData)
-    } catch (e) {
-      logger.error(`解析${getPageRes.fileName}的productData失败`, e)
+    if (getPageRes.productData instanceof String) {
+      try{
+        jsonObj = JSON.parse(getPageRes.productData)
+      } catch (e) {
+        logger.error(`解析${getPageRes.fileName}的productData失败`, e)
+      }
+    } else {
+      jsonObj = getPageRes.productData
     }
+
 
     if (!(jsonObj.status === 0 && jsonObj.data.error===null)) {
       flag = false
@@ -146,7 +259,7 @@ module.exports = class CtripFlightsPriceSpider {
 
     if (flag) {
       const nowTime = dayjs().format('YYYY-MM-DD-HH-mm-ss') // 获取当前时间
-      fs.writeFile(`./test/json/${getPageRes.fileName}`, JSON.stringify(flightInfoList), (err) => {
+      fs.writeFile(`./test/json/20190109/${getPageRes.fileName}.json`, JSON.stringify(flightInfoList), (err) => {
         if (err) logger.error(`写入 ${getPageRes.fileName} 失败`, err)
         logger.info(`保存flightInfoList,写入 ${getPageRes.fileName} 成功`);
       })

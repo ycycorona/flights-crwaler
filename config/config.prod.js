@@ -1,8 +1,4 @@
 module.exports = {
-  useProxy: true,
-  proxyProtocol: 'SOCKS5',
-  proxyHost: '127.0.0.1',
-  proxyPort: '10091',
   chromeOptions: {
     ignoreHTTPSErrors: true,
     headless: true,
@@ -16,11 +12,11 @@ module.exports = {
   ctripFlightsPriceSpider: {
     params: {
       baseUrl: 'http://flights.ctrip.com/itinerary/',
-      dateStart: '2019-01-09',
-      dateEnd: '2019-01-30',
+      dateStart: '2019-01-10',
+      dateEnd: '2019-01-10',
       flightLines: [
         ['hrb', 'tao'],
-        ['tao', 'hrb'],
+/*        ['tao', 'hrb'],
         ['zha', 'tao'],
         ['tao', 'zha'],
         ['kry', 'tao'],
@@ -77,8 +73,7 @@ module.exports = {
         ['nng', 'cgq'],
         ['cgq', 'nng'],
         ['hak', 'cgq'],
-        ['cgq', 'hak']]
-
+        ['cgq', 'hak']*/]
     }
   }
 }
