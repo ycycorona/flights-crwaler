@@ -17,6 +17,7 @@
     "dayjs": "^1.7.8",
     "debug": "^4.1.1",
     "filenamify": "^2.1.0",
+    "fs-extra": "^7.0.1",
     "lodash": "^4.17.11",
     "log4js": "^3.0.6",
     "proxy-agent": "^3.0.3",

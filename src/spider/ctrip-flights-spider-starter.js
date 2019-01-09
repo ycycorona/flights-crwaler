@@ -13,16 +13,15 @@ module.exports = async () => {
 
   try {
     const {
-      dateStart,
-      dateEnd,
-      flightLines
+      dateStart, // 开始时间
+      dateEnd, // 结束时间
+      flightLines // 航线列表
     } = config.ctripFlightsPriceSpider.params
-    logger.info(flightLines, dateStart, dateEnd)
-    return
+
     const browser = await getBrowser(config.chromeOptions)
 
-    const spider = new CtripFlightsPriceSpider(config.ctripFlightsPriceSpider, browser)
-    const dateList = util.getDateList(dateStart, dateEnd)
+    const spider = new CtripFlightsPriceSpider(config.ctripFlightsPriceSpider, browser) // 爬虫实例初始化
+    const dateList = util.getDateList(dateStart, dateEnd) // 日期列表初始化
 
     const taskQueue = queue(async (task) => {
       logger.info('当前任务并发数',taskQueue.running())
@@ -76,14 +75,17 @@ module.exports = async () => {
         // await spider.getPage(date, flightLine)
         taskQueue.push({spider, date, flightLine}, function (err, res) {
           if (err) {
-            logger.error('任务失败', err)
+            logger.error('单条爬取失败', err)
           } else {
-            logger.info('任务成功', err, res)
+            logger.info('单条爬取成功', err, res)
           }
         })
       }
     }
     logger.info(`队列长度${taskQueue.length()}`)
+    if (taskQueue.length() === 0) {
+      logger.info(`队列为空，结束爬虫任务`)
+    }
   } catch (e) {
     logger.error(e)
     error = e

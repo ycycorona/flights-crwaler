@@ -5,7 +5,7 @@ const config = require('../config')
   try {
     const res = await ctripFlightSpiderStarter()
   } catch (e) {
-    console.log(e)
+    logger.error(e)
   }
 })()
 

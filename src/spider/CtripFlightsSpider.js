@@ -1,9 +1,11 @@
 const logger = require('../common/logger')(__filename)
 const fs = require('fs')
+const path = require('path')
 const cheerio = require('cheerio')
 const axios = require('../common/request/simulate-browser-axios')
 const dayjs = require('dayjs')
 const getTextNode = require('../util').getTextNode
+const config = require('../../config')
 
 module.exports = class CtripFlightsPriceSpider {
   constructor(options, browser) {
@@ -128,26 +130,10 @@ module.exports = class CtripFlightsPriceSpider {
       logger.info('获取到product接口信息', date, flightLine)
       const nowTime = dayjs().format('YYYY-MM-DD-HH-mm-ss') // 获取当前时间
       fileName = `[${flightLine[0]}-${flightLine[1]}][date=${date}][${nowTime}]`
-/*
-      fileName = `[${flightLine[0]}-${flightLine[1]}][date=${date}][${nowTime}].json`
-      // 本地储存获取到的json
-      fs.writeFile(`./test/json/${fileName}`, productData, (err) => {
-        if (err) logger.error(`写入 ${fileName} 失败`, err)
-        logger.info(`保存productData,写入 ${fileName} 成功`);
-      })*/
     } else {
       flag = false
       logger.error('获取到product接口信息失败', date, flightLine)
     }
-
-    //const pageDocStr = await page.mainFrame().content()
-    // 保存文件存档
-/*    const nowTime = dayjs().format('YYYY-MM-DD-HH-mm-ss')
-    const fileName = `[${flightLine[0]}-${flightLine[1]}][date=${date}][${nowTime}].html`
-    fs.writeFile(`./test/${fileName}`, pageDocStr, (err) => {
-      if (err) logger.error(`写入 ${fileName} 失败`, err)
-      logger.all(`写入 ${fileName} 成功`);
-    })*/
     // 强制停止页面
     await page.evaluate(() => window.stop());
     // await page.waitFor(1000)
@@ -258,8 +244,13 @@ module.exports = class CtripFlightsPriceSpider {
     }
 
     if (flag) {
-      const nowTime = dayjs().format('YYYY-MM-DD-HH-mm-ss') // 获取当前时间
-      fs.writeFile(`./test/json/20190109/${getPageRes.fileName}.json`, JSON.stringify(flightInfoList), (err) => {
+      const nowObj = dayjs()
+      const nowTime = nowObj.format('YYYY-MM-DD-HH-mm-ss') // 获取当前时间
+      const nowDate = nowObj.format('YYYYMMDD') // 获取当前日期
+      const bachCode = 1
+      const rawDataDir = config.ctripFlightsPriceSpider.rawFlightInfoListSavePath
+      const rawDataPath = path.join(rawDataDir, `${nowDate}-${bachCode}/${getPageRes.fileName}.json`)
+      fs.writeFile(rawDataPath, JSON.stringify(flightInfoList), (err) => {
         if (err) logger.error(`写入 ${getPageRes.fileName} 失败`, err)
         logger.info(`保存flightInfoList,写入 ${getPageRes.fileName} 成功`);
       })
