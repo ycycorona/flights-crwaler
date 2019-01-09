@@ -4,7 +4,7 @@ const path = require('path')
 const logger = require('../src/common/logger')(__filename)
 
 
-
+logger.all(123)
 
 
 logger.info(123)

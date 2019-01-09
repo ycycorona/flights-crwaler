@@ -1,7 +1,7 @@
 {
   "appenders": {
     "console": {
-      "type": "stdout",
+      "type": "console",
       "layout": {
         "type": "pattern",
         "pattern": "%[[%d{ISO8601}][%p %z %c %X{filePath}] - %m%]"

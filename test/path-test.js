@@ -1,3 +1,4 @@
+const proc = require('./process-args-test')
 const path = require('path')
 
 const fs = require('fs-extra')
@@ -7,5 +8,9 @@ fs.ensureDir('./tmp/a', (err) => {
 })
 
 console.log(process.env.NODE_ENV)
+global._gbVar =batch = 1
 process.env.NODE_ENV = 123
-console.log(process.env.NODE_ENV)
+
+
+console.log(batch)
+

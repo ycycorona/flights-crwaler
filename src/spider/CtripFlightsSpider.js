@@ -144,11 +144,30 @@ module.exports = class CtripFlightsPriceSpider {
       productData
     }
   }
-  async getProduct(date, flightLine, baseUrl, headers, requestData) {
+  async getProduct(date, flightLine) {
     let flag = true
     let fileName
+    const baseUrl = 'http://flights.ctrip.com/itinerary/api/12808/productsxxx'
+    const requestData = {
+      "flightWay": "Oneway",
+      "classType": "ALL",
+      "hasChild": false,
+      "hasBaby": false,
+      "searchIndex": 1,
+      "airportParams": [{
+        "dcity": flightLine[0],
+        "acity": flightLine[1],
+        "date": date,
+        "aport": "",
+        "aportname": ""
+      }],
+      "army": false,
+    }
+    const headers = {
+      'Referer': `http://flights.ctrip.com/itinerary/oneway/${flightLine[0]}-${flightLine[1]}?date=${date}`,
+      'Origin': 'http://flights.ctrip.com',
+    }
     const productData = await new Promise((resolve, reject) => {
-
       axios({
         method: 'POST',
         url: baseUrl,
@@ -158,7 +177,7 @@ module.exports = class CtripFlightsPriceSpider {
         .then(function(response) {
           if (!(response.data.status === 0 && response.data.data.error===null)) {
             flag = false
-            logger.error('直接请求getProduct失败', response.data.data.error || '')
+            logger.error('直接请求getProduct失败', response.data.msg || response.data.data.error || '')
             resolve(null)
           } else {
             resolve(response.data)
@@ -176,7 +195,7 @@ module.exports = class CtripFlightsPriceSpider {
       fileName = `[${flightLine[0]}-${flightLine[1]}][date=${date}][${nowTime}]`
     } else {
       flag = false
-      logger.error('获取到product接口信息失败', date, flightLine)
+      logger.error('获取product接口信息失败', date, flightLine)
     }
 
     return {
@@ -244,7 +263,9 @@ module.exports = class CtripFlightsPriceSpider {
     }
 
     if (flag) {
-      const nowObj = dayjs()
+      const _gbVar = global._gbVar
+      console.log(_gbVar.taskStartTime, _gbVar.taskStartDate, _gbVar.bachCode)
+/*      const nowObj = dayjs()
       const nowTime = nowObj.format('YYYY-MM-DD-HH-mm-ss') // 获取当前时间
       const nowDate = nowObj.format('YYYYMMDD') // 获取当前日期
       const bachCode = 1
@@ -253,7 +274,7 @@ module.exports = class CtripFlightsPriceSpider {
       fs.writeFile(rawDataPath, JSON.stringify(flightInfoList), (err) => {
         if (err) logger.error(`写入 ${getPageRes.fileName} 失败`, err)
         logger.info(`保存flightInfoList,写入 ${getPageRes.fileName} 成功`);
-      })
+      })*/
     }
 
     return {flag, flightInfoList}

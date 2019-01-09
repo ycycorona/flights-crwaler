@@ -1,5 +1,5 @@
 const dayjs = require('dayjs')
-
+const logger = require('./common/logger')(__filename)
 module.exports = {
   getDateList(dateStartStr, dateEndStr) {
     const dataList = []
@@ -14,6 +14,12 @@ module.exports = {
   getTextNode(obj) {
     return obj.contents().filter((index, content) => {
       return content.nodeType === 3
+    })
+  },
+  sleep(delay) {
+    return new Promise((resolve, reject) => {
+      logger.info(`等待${delay}ms`)
+      setTimeout(() => resolve(), delay)
     })
   }
 }
