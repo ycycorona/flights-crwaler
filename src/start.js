@@ -1,3 +1,4 @@
+process.env.NODE_ENV = 'production'
 const dayjs = require('dayjs')
 
 const logger = require('./common/logger')(__filename)
@@ -10,6 +11,10 @@ _gbVar.isJobProcessing = false
 
 const j = schedule.scheduleJob('0 0,15,30,45 0-23 * * *', async () => {
     try {
+      if (_gbVar.isJobProcessing === true) {
+        return
+      }
+
       logger.info(`内存使用量：${JSON.stringify(process.memoryUsage())}`)
       const jobStartTimeObj = _gbVar.taskStartTimeObj = dayjs()
       _gbVar.taskStartTime = jobStartTimeObj.format('YYYY-MM-DD-HH-mm-ss') // 获取当前时间
@@ -25,6 +30,14 @@ const j = schedule.scheduleJob('0 0,15,30,45 0-23 * * *', async () => {
     }
     _gbVar.isJobProcessing = false
   })
+
+const j_1 = schedule.scheduleJob('50 59 23 * * *', async () => {
+  try {
+    _gbVar.bachCode = 0
+  } catch (e) {
+    logger.error(e)
+  }
+})
 
 
 
