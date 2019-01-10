@@ -3,7 +3,7 @@ const path = require('path')
 
 const fs = require('fs-extra')
 
-fs.ensureDir('./tmp/a', (err) => {
+/*fs.ensureDir('./tmp/a', (err) => {
   if (err) console.log(err)
 })
 
@@ -12,5 +12,10 @@ global._gbVar =batch = 1
 process.env.NODE_ENV = 123
 
 
-console.log(batch)
+console.log(batch)*/
+
+fs.remove(path.join(process.cwd(), 'logs'))
+  .then( () => {
+    console.log('success')
+  })
 

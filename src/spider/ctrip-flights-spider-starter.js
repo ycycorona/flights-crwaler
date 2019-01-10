@@ -1,33 +1,40 @@
 const path = require('path')
+const fs = require('fs-extra')
 const logger = require('../common/logger')(__filename)
 const getBrowser = require('../browser')
 const util = require('../util')
 const queue = require('async/queue')
 const config = require('../../config')
 const dayjs = require('dayjs')
-
+//const _gbVar = global._gbVar
 const CtripFlightsPriceSpider = require('./CtripFlightsSpider')
 
 module.exports = async () => {
-  let error = null
   let retryTimes = 0
   let failTaskList = []
   let taskNumber = 0
-
+  let browser
+return new Promise(async (resolve, reject) => {
   try {
     const {
-      dateStart, // 开始时间
-      dateEnd, // 结束时间
-      flightLines // 航线列表
+      flightLines, // 航线列表
+      duration,
     } = config.ctripFlightsPriceSpider.params
     // 浏览器实例化
-    const browser = await getBrowser(config.chromeOptions)
+    browser = null //await getBrowser(config.chromeOptions)
     // 爬虫实例初始化
     const spider = new CtripFlightsPriceSpider(config.ctripFlightsPriceSpider, browser)
-
+    // 保存路径初始化
+    const jsonSavePath = path.join(process.cwd(), 'data-save/ctripFlightsPriceSpider',
+      `[${_gbVar.taskStartTime}][${_gbVar.bachCode}]`,)
+    _gbVar.jsonSavePath = jsonSavePath
+    logger.info(`当前批次[${_gbVar.taskStartTime}][${_gbVar.bachCode}]`)
+    await fs.ensureDir(jsonSavePath)
     // 一些元数据
+    const dateStart = dayjs().format('YYYY-MM-DD')
+    const dateEnd = dayjs().add(duration-1, 'day').format('YYYY-MM-DD')
     const dateList = util.getDateList(dateStart, dateEnd) // 日期列表初始化
-
+    //throw new Error('test')
     // 任务的通用操作（尽量精简）
     const taskQueue = queue(async (task) => {
       logger.info(`当前并发任务数${taskQueue.running()}`, `待执行任务数${taskQueue.length()}`)
@@ -45,9 +52,9 @@ module.exports = async () => {
       logger.info(`任务总数${taskNumber}，失败任务数${failTaskList.length}`)
       const _failTaskList = failTaskList
       failTaskList = []
-      await util.sleep(1000)
       if (_failTaskList.length > 0 && retryTimes < 3) {
         retryTimes ++
+        await util.sleep(1000)
         logger.info(`第${retryTimes}次重试失败任务`)
         for (const task of _failTaskList) {
           taskQueue.push(task, taskEndHandle)
@@ -56,7 +63,11 @@ module.exports = async () => {
         logger.info('任务执行完毕！！！')
         logger.info(`任务执行次数${retryTimes+1}`)
         logger.info(`任务总数${taskNumber}，最终失败任务数${_failTaskList.length}`)
-        await browser.close()
+        if (browser) {
+          await browser.close()
+          resolve(true)
+        }
+        resolve(true)
       }
     }
 
@@ -110,18 +121,21 @@ module.exports = async () => {
 
     logger.info(`队列长度${taskQueue.length()}`)
     taskNumber = taskQueue.length()
+
     if (taskQueue.length() === 0) {
       logger.info(`队列为空，直接结束爬虫任务`)
-      await browser.close()
+      if (browser) {
+        await browser.close()
+      }
+      resolve(true)
     }
   } catch (e) {
     logger.error(e)
-    error = e
+    if (browser) {
+      await browser.close()
+    }
+    resolve(false)
   }
+})
 
-  if (error) {
-    return false
-  } else {
-    return true
-  }
 }

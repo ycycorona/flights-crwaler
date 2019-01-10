@@ -1,5 +1,5 @@
 const logger = require('../common/logger')(__filename)
-const fs = require('fs')
+const fs = require('fs-extra')
 const path = require('path')
 const cheerio = require('cheerio')
 const axios = require('../common/request/simulate-browser-axios')
@@ -147,7 +147,7 @@ module.exports = class CtripFlightsPriceSpider {
   async getProduct(date, flightLine) {
     let flag = true
     let fileName
-    const baseUrl = 'http://flights.ctrip.com/itinerary/api/12808/productsxxx'
+    const baseUrl = 'http://flights.ctrip.com/itinerary/api/12808/products'
     const requestData = {
       "flightWay": "Oneway",
       "classType": "ALL",
@@ -192,7 +192,7 @@ module.exports = class CtripFlightsPriceSpider {
     if (productData) {
       logger.info('获取到product接口信息', date, flightLine)
       const nowTime = dayjs().format('YYYY-MM-DD-HH-mm-ss') // 获取当前时间
-      fileName = `[${flightLine[0]}-${flightLine[1]}][date=${date}][${nowTime}]`
+      fileName = `[${flightLine[0]}-${flightLine[1]}][date=${date}][getTime=${nowTime}]`
     } else {
       flag = false
       logger.error('获取product接口信息失败', date, flightLine)
@@ -263,18 +263,11 @@ module.exports = class CtripFlightsPriceSpider {
     }
 
     if (flag) {
-      const _gbVar = global._gbVar
-      console.log(_gbVar.taskStartTime, _gbVar.taskStartDate, _gbVar.bachCode)
-/*      const nowObj = dayjs()
-      const nowTime = nowObj.format('YYYY-MM-DD-HH-mm-ss') // 获取当前时间
-      const nowDate = nowObj.format('YYYYMMDD') // 获取当前日期
-      const bachCode = 1
-      const rawDataDir = config.ctripFlightsPriceSpider.rawFlightInfoListSavePath
-      const rawDataPath = path.join(rawDataDir, `${nowDate}-${bachCode}/${getPageRes.fileName}.json`)
+      const rawDataPath = path.join(_gbVar.jsonSavePath, `${getPageRes.fileName}.json`)
       fs.writeFile(rawDataPath, JSON.stringify(flightInfoList), (err) => {
         if (err) logger.error(`写入 ${getPageRes.fileName} 失败`, err)
         logger.info(`保存flightInfoList,写入 ${getPageRes.fileName} 成功`);
-      })*/
+      })
     }
 
     return {flag, flightInfoList}

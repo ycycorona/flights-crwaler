@@ -9,7 +9,7 @@
     },
     "trace": {
       "type": "dateFile",
-      "filename": "./logs/access-",
+      "filename": "./tmp/logs/access-",
       "pattern": ".yyyy-MM-dd.log",
       "alwaysIncludePattern": true,
       "maxLogSize ": 31457280
@@ -22,7 +22,7 @@
     },
     "info": {
       "type": "dateFile",
-      "filename": "./logs/info-",
+      "filename": "./tmp/logs/info-",
       "encoding": "utf-8",
       "pattern": ".yyyy-MM-dd.log",
       "maxLogSize": 10000000,
@@ -41,7 +41,7 @@
     },
     "error": {
       "type": "dateFile",
-      "filename": "./logs/error-",
+      "filename": "./tmp/logs/error-",
       "pattern": ".yyyy-MM-dd.log",
       "maxLogSize": 10000000,
       "encoding": "utf-8",

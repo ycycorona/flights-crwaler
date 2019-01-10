@@ -6,7 +6,8 @@
   "scripts": {
     "test": "node test/dayjs-test.js",
     "dev": "node src/dev.js",
-    "start": "node src/start.js"
+    "start": "node src/start.js",
+    "remove": "node test/path-test.js"
   },
   "author": "ycy",
   "license": "MIT",
@@ -20,6 +21,7 @@
     "fs-extra": "^7.0.1",
     "lodash": "^4.17.11",
     "log4js": "^3.0.6",
+    "node-schedule": "^1.3.1",
     "proxy-agent": "^3.0.3",
     "puppeteer": "^1.11.0",
     "qs": "^6.6.0",
