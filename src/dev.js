@@ -1,3 +1,4 @@
+process.env.NODE_ENV = 'development'
 const dayjs = require('dayjs')
 const logger = require('./common/logger')(__filename)
 const schedule = require('node-schedule');
@@ -56,6 +57,7 @@ _gbVar.isJobProcessing = false
 
 
 /*;(async () => {
+;(async () => {
   logger.info(`内存使用量：${JSON.stringify(process.memoryUsage())}`)
   const jobStartTimeObj = _gbVar.taskStartTimeObj = dayjs()
   _gbVar.taskStartTimeObj = jobStartTimeObj

@@ -51,7 +51,6 @@ module.exports = class CtripFlightsPriceSpider {
       page.on('requestfinished', (request) => {
         const url = request.url()
         if (url.match(/api\/\w+\/products/)) {
-          logger.debug(request.headers())
         } else {
 
         }
@@ -76,7 +75,7 @@ module.exports = class CtripFlightsPriceSpider {
     })
 
     if (productRequestBody) {
-      logger.info(productRequestBody)
+      logger.debug(productRequestBody)
     } else {
       flag = false
     }
@@ -127,7 +126,7 @@ module.exports = class CtripFlightsPriceSpider {
     })
 
     if (productData) {
-      logger.info('获取到product接口信息', date, flightLine)
+      logger.debug('获取到product接口信息', date, flightLine)
       const nowTime = dayjs().format('YYYY-MM-DD-HH-mm-ss') // 获取当前时间
       fileName = `[${flightLine[0]}-${flightLine[1]}][date=${date}][${nowTime}]`
     } else {
@@ -147,7 +146,7 @@ module.exports = class CtripFlightsPriceSpider {
   async getProduct(date, flightLine) {
     let flag = true
     let fileName
-    const baseUrl = 'http://flights.ctrip.com/itinerary/api/12808/products'
+    const baseUrl = 'https://flights.ctrip.com/itinerary/api/12808/products'
     const requestData = {
       "flightWay": "Oneway",
       "classType": "ALL",
@@ -164,8 +163,8 @@ module.exports = class CtripFlightsPriceSpider {
       "army": false,
     }
     const headers = {
-      'Referer': `http://flights.ctrip.com/itinerary/oneway/${flightLine[0]}-${flightLine[1]}?date=${date}`,
-      'Origin': 'http://flights.ctrip.com',
+      'Referer': `https://flights.ctrip.com/itinerary/oneway/${flightLine[0]}-${flightLine[1]}?date=${date}`,
+      'Origin': 'https://flights.ctrip.com',
     }
     const productData = await new Promise((resolve, reject) => {
       axios({
@@ -177,7 +176,8 @@ module.exports = class CtripFlightsPriceSpider {
         .then(function(response) {
           if (!(response.data.status === 0 && response.data.data.error===null)) {
             flag = false
-            logger.error('直接请求getProduct失败', response.data.msg || response.data.data.error || '')
+            //logger.error('直接请求getProduct失败', response.data.msg || response.data.data.error || '')
+            logger.error('直接请求getProduct失败', response)
             resolve(null)
           } else {
             resolve(response.data)
@@ -190,7 +190,7 @@ module.exports = class CtripFlightsPriceSpider {
     })
 
     if (productData) {
-      logger.info('获取到product接口信息', date, flightLine)
+      logger.debug('获取到product接口信息', date, flightLine)
       const nowTime = dayjs().format('YYYY-MM-DD-HH-mm-ss') // 获取当前时间
       fileName = `[${flightLine[0]}-${flightLine[1]}][date=${date}][getTime=${nowTime}]`
     } else {
@@ -229,7 +229,7 @@ module.exports = class CtripFlightsPriceSpider {
     }
 
     if(flag) {
-      const routeList = jsonObj.data.routeList
+      const routeList = jsonObj.data.routeList ? jsonObj.data.routeList : []
       for (const route of routeList) {
         if (route.routeType === 'Flight') {
           const flightInfo = {}
@@ -266,7 +266,7 @@ module.exports = class CtripFlightsPriceSpider {
       const rawDataPath = path.join(_gbVar.jsonSavePath, `${getPageRes.fileName}.json`)
       fs.writeFile(rawDataPath, JSON.stringify(flightInfoList), (err) => {
         if (err) logger.error(`写入 ${getPageRes.fileName} 失败`, err)
-        logger.info(`保存flightInfoList,写入 ${getPageRes.fileName} 成功`);
+        logger.debug(`保存flightInfoList,写入 ${getPageRes.fileName} 成功`);
       })
     }
 

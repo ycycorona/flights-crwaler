@@ -37,7 +37,7 @@ return new Promise(async (resolve, reject) => {
     //throw new Error('test')
     // 任务的通用操作（尽量精简）
     const taskQueue = queue(async (task) => {
-      logger.info(`当前并发任务数${taskQueue.running()}`, `待执行任务数${taskQueue.length()}`)
+      logger.debug(`当前并发任务数${taskQueue.running()}`, `待执行任务数${taskQueue.length()}`)
       //const getPageRes = await task.spider.getPage(task.date, task.flightLine)
       if(await task.productTaskDo()) {
         return true
@@ -48,7 +48,7 @@ return new Promise(async (resolve, reject) => {
 
     // 队列完成时的处理函数
     taskQueue.drain = async () => {
-      logger.info('任务队列清空！')
+      logger.info('任务队列放空！')
       logger.info(`任务总数${taskNumber}，失败任务数${failTaskList.length}`)
       const _failTaskList = failTaskList
       failTaskList = []
@@ -71,7 +71,7 @@ return new Promise(async (resolve, reject) => {
       }
     }
 
-    // 每个任务的 未捕获错误 处理函数
+    // 每个任务的 错误 处理函数
     taskQueue.error = function(error, task) {
       logger.error('error in task', error);
       logger.error(`错误的任务为：${task.toString()}`);
@@ -85,7 +85,7 @@ return new Promise(async (resolve, reject) => {
      */
     function taskEndHandle(err, res) {
       if (!err) {
-        logger.info('单条爬取成功')
+        logger.debug('单条爬取成功')
       }
     }
 
