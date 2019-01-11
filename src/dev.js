@@ -1,8 +1,40 @@
 const dayjs = require('dayjs')
 const logger = require('./common/logger')(__filename)
 const schedule = require('node-schedule');
+const promisify = require('util').promisify
+const dbConnect = require('./models/db-cennect')
+const ProcessState = require('./models/process-state')
 const ctripFlightSpiderStarter = require('./spider/ctrip-flights-spider-starter');
 const _gbVar = global._gbVar = {}
+
+
+  ;(async () => {
+  try {
+    await dbConnect()
+/*    const processState = new ProcessState()
+    await processState.save({})*/
+    const doc = await ProcessState.findOneAndUpdate(
+      {date: dayjs().startOf('day').toDate()},
+      {
+        $inc: { batchCode: 1 }
+      },
+      {
+        new: true,
+        upsert: true,
+        setDefaultsOnInsert: true
+      })
+
+    console.log(doc)
+
+    process.exit(0)
+  } catch (e) {
+    logger.error(e)
+  }
+  process.exit(0)
+  })()
+
+
+
 
 _gbVar.bachCode = 0
 _gbVar.isJobProcessing = false
@@ -23,7 +55,7 @@ _gbVar.isJobProcessing = false
 })*/
 
 
-;(async () => {
+/*;(async () => {
   logger.info(`内存使用量：${JSON.stringify(process.memoryUsage())}`)
   const jobStartTimeObj = _gbVar.taskStartTimeObj = dayjs()
   _gbVar.taskStartTimeObj = jobStartTimeObj
@@ -38,6 +70,6 @@ _gbVar.isJobProcessing = false
   } catch (e) {
     logger.error(e)
   }
-})()
+})()*/
 
 
