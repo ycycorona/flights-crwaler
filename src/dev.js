@@ -12,20 +12,13 @@ const _gbVar = global._gbVar = {}
   ;(async () => {
   try {
     await dbConnect()
-/*    const processState = new ProcessState()
-    await processState.save({})*/
-    const doc = await ProcessState.findOneAndUpdate(
-      {date: dayjs().startOf('day').toDate()},
-      {
-        $inc: { batchCode: 1 }
-      },
-      {
-        new: true,
-        upsert: true,
-        setDefaultsOnInsert: true
-      })
 
+    //const doc = await ProcessState.initProcessState()
+    //const doc_1 = await ProcessState.getProcessState().filter()
+    const doc = await ProcessState.getProcessState()
     console.log(doc)
+    doc.batchCode ++
+    await doc.save()
 
     process.exit(0)
   } catch (e) {

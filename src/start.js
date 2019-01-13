@@ -9,7 +9,7 @@ const _gbVar = global._gbVar = {}
 _gbVar.bachCode = 0
 _gbVar.isJobProcessing = false
 
-const j = schedule.scheduleJob('0 0,15,30,45 0-23 * * *', async () => {
+const j = schedule.scheduleJob('0 0 0-23 * * *', async () => {
     try {
       if (_gbVar.isJobProcessing === true) {
         return

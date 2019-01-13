@@ -4,9 +4,6 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema;
 
 const processStateSchema = new Schema({
-  name: {
-    type: String,
-  },
   date: {
     unique: true,
     type: Date,
@@ -14,9 +11,37 @@ const processStateSchema = new Schema({
   },
   batchCode: {
     type: Number,
-    default: 0
+    default: 0,
   },
 })
+
+processStateSchema.statics.initProcessState = async function() {
+  const newProcessState = await ProcessState.findOneAndUpdate(
+    {date: dayjs().startOf('day').toDate()},
+    {
+      $inc: { batchCode: 1 }
+    },
+    {
+      new: true,
+      upsert: true,
+      setDefaultsOnInsert: true
+    })
+  return newProcessState
+}
+
+processStateSchema.statics.getProcessState = async function() {
+  const processState = await ProcessState.findOne(
+    {date: dayjs().startOf('day').toDate()}).select()
+  return processState
+}
+
+processStateSchema.query.filter = function(str) {
+  let filter = 'date batchCode -_id'
+  if(str) {
+    filter = str
+  }
+  return this.select(filter)
+}
 
 // Defines a pre hook for the document.
 processStateSchema.pre('save', function(next) {

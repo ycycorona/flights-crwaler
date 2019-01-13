@@ -4,7 +4,7 @@ const config = require(path.join(process.cwd(), 'config'))
 module.exports = (options) => {
   const axios = require('axios');
   const axiosOpts = {}
-  axiosOpts.timeout = options.timeout || 40000
+  axiosOpts.timeout = options.timeout || 10000
   axiosOpts.headers = options.headers || {}
 
   if (config.axios && config.axios.useProxy) {
