@@ -10,7 +10,7 @@ module.exports = {
     }
   },
   mongodb: {
-    dbUrl: 'mongodb://47.105.46.120:27017/flights-crawler',
+    dbUrl: 'mongodb://127.0.0.1:27017/flights-crawler',
     obOptions: {
       useNewUrlParser: true,
       user: 'flightsCrawler',

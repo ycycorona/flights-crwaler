@@ -56,6 +56,19 @@ module.exports = {
       "type": "logLevelFilter",
       "appender": "error",
       "level": "error"
+    },
+    "directScript": {
+      "type": "dateFile",
+      "filename": "./tmp/logs/directScript-",
+      "encoding": "utf-8",
+      "pattern": ".yyyy-MM-dd.log",
+      "maxLogSize": 10000000,
+      "alwaysIncludePattern": true,
+      "layout": {
+        "type": "pattern",
+        "pattern": "[%d{ISO8601}][%p %z %c %X{filePath}] - %m"
+      },
+      "compress": true
     }
   },
   "categories": {
@@ -65,6 +78,13 @@ module.exports = {
         "http",
         "maxInfo",
         "minError"
+      ],
+      "level": "all"
+    },
+    "save-flight-infos": {
+      "appenders": [
+        "console",
+        "directScript",
       ],
       "level": "all"
     }

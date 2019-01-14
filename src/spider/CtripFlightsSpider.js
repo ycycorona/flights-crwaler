@@ -6,6 +6,8 @@ const axios = require('../common/request/simulate-browser-axios')
 const dayjs = require('dayjs')
 const getTextNode = require('../util').getTextNode
 const config = require('../../config')
+const FlightInfo = require('../models/flight-info')
+
 
 module.exports = class CtripFlightsPriceSpider {
   constructor(options, browser) {
@@ -271,6 +273,16 @@ module.exports = class CtripFlightsPriceSpider {
     }
 
     return {flag, flightInfoList}
+  }
+
+  async saveFlightInfoToMongo(flightInfoList) {
+    const flag = true
+
+    const doc = new FlightInfo(flightInfoList[0])
+    const res = await doc.save()
+
+    logger.info('保存完毕')
+
   }
 
   extraInfoFromPage(docStr) {

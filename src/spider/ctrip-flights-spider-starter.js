@@ -100,6 +100,7 @@ return new Promise(async (resolve, reject) => {
         return false
       }
       const extraRes = this.spider.extraInfoFromJson(getPageRes)
+      await this.spider.saveFlightInfoToMongo(extraRes.flightInfoList)
       return true
     }
 

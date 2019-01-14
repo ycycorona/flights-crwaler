@@ -9,7 +9,7 @@ const ctripFlightSpiderStarter = require('./spider/ctrip-flights-spider-starter'
 const _gbVar = global._gbVar = {}
 
 
-  ;(async () => {
+/*  ;(async () => {
   try {
     await dbConnect()
 
@@ -25,7 +25,7 @@ const _gbVar = global._gbVar = {}
     logger.error(e)
   }
   process.exit(0)
-  })()
+  })()*/
 
 
 
@@ -49,8 +49,9 @@ _gbVar.isJobProcessing = false
 })*/
 
 
-/*;(async () => {
+
 ;(async () => {
+  await dbConnect()
   logger.info(`内存使用量：${JSON.stringify(process.memoryUsage())}`)
   const jobStartTimeObj = _gbVar.taskStartTimeObj = dayjs()
   _gbVar.taskStartTimeObj = jobStartTimeObj
@@ -65,6 +66,6 @@ _gbVar.isJobProcessing = false
   } catch (e) {
     logger.error(e)
   }
-})()*/
+})()
 
 

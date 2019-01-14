@@ -39,7 +39,10 @@ const j_1 = schedule.scheduleJob('50 59 23 * * *', async () => {
   }
 })
 
-
+setInterval(() => {
+  logger.info(`存活检测`)
+  logger.info(`当前bachCode: ${_gbVar.bachCode}, 当前是否正在工作：${_gbVar.isJobProcessing}`)
+}, 300000)
 
 /*;(async () => {
   try {
