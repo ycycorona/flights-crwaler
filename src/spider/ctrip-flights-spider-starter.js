@@ -26,9 +26,9 @@ return new Promise(async (resolve, reject) => {
     const spider = new CtripFlightsPriceSpider(config.ctripFlightsPriceSpider, browser)
     // 保存路径初始化
     const jsonSavePath = path.join(process.cwd(), 'data-save/ctripFlightsPriceSpider',
-      `[${_gbVar.taskStartTime}][${_gbVar.bachCode}]`,)
+      `[${_gbVar.taskStartTime}][${_gbVar.batchCode}]`,)
     _gbVar.jsonSavePath = jsonSavePath
-    logger.info(`当前批次[${_gbVar.taskStartTime}][${_gbVar.bachCode}]`)
+    logger.info(`当前批次[${_gbVar.taskStartTime}][${_gbVar.batchCode}]`)
     await fs.ensureDir(jsonSavePath)
     // 一些元数据
     const dateStart = dayjs().format('YYYY-MM-DD')
@@ -100,7 +100,7 @@ return new Promise(async (resolve, reject) => {
         return false
       }
       const extraRes = this.spider.extraInfoFromJson(getPageRes)
-      await this.spider.saveFlightInfoToMongo(extraRes.flightInfoList)
+      const saveJson = await this.spider.saveFlightInfoToMongo(extraRes.flightInfoList)
       return true
     }
 

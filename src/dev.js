@@ -30,8 +30,7 @@ const _gbVar = global._gbVar = {}
 
 
 
-_gbVar.bachCode = 0
-_gbVar.isJobProcessing = false
+
 
 /*const j = schedule.scheduleJob('1 * * * * *', async () => {
   try {
@@ -51,7 +50,11 @@ _gbVar.isJobProcessing = false
 
 
 ;(async () => {
-  await dbConnect()
+  const db = await dbConnect()
+  const processState = await ProcessState.initProcessState()
+  _gbVar.bachCode = processState.batchCode
+  _gbVar.isJobProcessing = false
+
   logger.info(`内存使用量：${JSON.stringify(process.memoryUsage())}`)
   const jobStartTimeObj = _gbVar.taskStartTimeObj = dayjs()
   _gbVar.taskStartTimeObj = jobStartTimeObj
@@ -63,6 +66,7 @@ _gbVar.isJobProcessing = false
     const jobFinishTimeObj = dayjs()
     const jobDuration = jobFinishTimeObj.diff(jobStartTimeObj, 'second')
     logger.info(`定时任务执行时间${jobDuration}`)
+    await db.close()
   } catch (e) {
     logger.error(e)
   }

@@ -276,13 +276,21 @@ module.exports = class CtripFlightsPriceSpider {
   }
 
   async saveFlightInfoToMongo(flightInfoList) {
-    const flag = true
+    let flag = true
+    let res
+    try {
+      const doc = new FlightInfo(flightInfoList[0])
+      res = await doc.save()
+    } catch (err) {
+      flag = false
+      logger.error('保存json到mongodb出错', err)
+    }
 
-    const doc = new FlightInfo(flightInfoList[0])
-    const res = await doc.save()
-
-    logger.info('保存完毕')
-
+    logger.debug('保存完毕')
+    return {
+      res,
+      flag
+    }
   }
 
   extraInfoFromPage(docStr) {

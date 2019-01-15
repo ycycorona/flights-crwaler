@@ -16,7 +16,7 @@ module.exports = async (options) => {
     })
     db.once('open', function() {
       logger.info('数据库连接成功')
-      resolve(true)
+      resolve(db)
     })
   })
 }
