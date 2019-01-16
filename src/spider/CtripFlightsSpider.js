@@ -179,7 +179,7 @@ module.exports = class CtripFlightsPriceSpider {
           if (!(response.data.status === 0 && response.data.data.error===null)) {
             flag = false
             //logger.error('直接请求getProduct失败', response.data.msg || response.data.data.error || '')
-            logger.error('直接请求getProduct失败', response)
+            logger.error('直接请求getProduct失败', response.data || response)
             resolve(null)
           } else {
             resolve(response.data)
@@ -279,8 +279,10 @@ module.exports = class CtripFlightsPriceSpider {
     let flag = true
     let res
     try {
-      const doc = new FlightInfo(flightInfoList[0])
-      res = await doc.save()
+      if(flightInfoList && flightInfoList.length > 0) {
+        const doc = new FlightInfo(flightInfoList[0])
+        res = await doc.save()
+      }
     } catch (err) {
       flag = false
       logger.error('保存json到mongodb出错', err)
