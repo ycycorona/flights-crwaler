@@ -243,6 +243,8 @@ module.exports = class CtripFlightsPriceSpider {
           const info = route.legs[0].flight
           flightInfo.airlineName = info.airlineName
           flightInfo.airlineCode = info.airlineCode
+          flightInfo.sharedFlightNumber = info.sharedFlightNumber
+          flightInfo.sharedFlightName = info.sharedFlightName
           flightInfo.craftTypeName = info.craftTypeName
           flightInfo.flightNumber = info.flightNumber
           flightInfo.departureAirportInfo = info.departureAirportInfo
@@ -260,7 +262,7 @@ module.exports = class CtripFlightsPriceSpider {
             cabin.priceClass = ca.priceClass
             cabin.rate = ca.price.rate
             cabin.seatCount = ca.seatCount
-            cabin.refundEndorse = ca.refundEndorse
+            //cabin.refundEndorse = ca.refundEndorse
             cabin.productInfoList = ca.productInfoList
             flightInfo.cabins.push(cabin)
           }

@@ -24,7 +24,7 @@ const _gbVar = global._gbVar = {}
 
     _gbVar.isJobProcessing = false
 
-    const j = schedule.scheduleJob('1 0 0-23 * * *', async () => {
+    const j = schedule.scheduleJob('1 30 0-23 * * *', async () => {
     //const j = schedule.scheduleJob('1,30 * * * * *', async () => {
       const processState = await ProcessState.initProcessState()
       _gbVar.batchCode = processState.batchCode
