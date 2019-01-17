@@ -52,7 +52,7 @@ const _gbVar = global._gbVar = {}
 ;(async () => {
   const db = await dbConnect()
   const processState = await ProcessState.initProcessState()
-  _gbVar.bachCode = processState.batchCode
+  _gbVar.batchCode = processState.batchCode
   _gbVar.isJobProcessing = false
 
   logger.info(`内存使用量：${JSON.stringify(process.memoryUsage())}`)

@@ -95,7 +95,8 @@ const flightInfoSchema = new Schema({
     type: Date
   },
   stopInfo: [stopInfoSchema],
-  cabins: [cabinSchema]
+  cabins: [cabinSchema],
+  getTime: Date
 })
 
 // flightInfoSchema.statics

@@ -148,6 +148,7 @@ module.exports = class CtripFlightsPriceSpider {
   async getProduct(date, flightLine) {
     let flag = true
     let fileName
+    let nowTime
     const baseUrl = 'https://flights.ctrip.com/itinerary/api/12808/products'
     const requestData = {
       "flightWay": "Oneway",
@@ -193,8 +194,10 @@ module.exports = class CtripFlightsPriceSpider {
 
     if (productData) {
       logger.debug('获取到product接口信息', date, flightLine)
-      const nowTime = dayjs().format('YYYY-MM-DD-HH-mm-ss') // 获取当前时间
-      fileName = `[${flightLine[0]}-${flightLine[1]}][date=${date}][getTime=${nowTime}]`
+      const nowTimeObj = dayjs()
+      nowTime = nowTimeObj.format('YYYY-MM-DD HH:mm:ss') // 获取当前时间
+      const nowTimeFileName = nowTimeObj.format('YYYY-MM-DD-HH-mm-ss') // 获取当前时间
+      fileName = `[${flightLine[0]}-${flightLine[1]}][date=${date}][getTime=${nowTimeFileName}]`
     } else {
       flag = false
       logger.error('获取product接口信息失败', date, flightLine)
@@ -203,12 +206,14 @@ module.exports = class CtripFlightsPriceSpider {
     return {
       flag,
       fileName,
+      nowTime,
       productData
     }
   }
   /**
    * 从ajax JSON提取数据
    * @param getPageRes
+   * @param nowTime
    * @returns {{flag: boolean, flightInfoList: Array}}
    */
   extraInfoFromJson(getPageRes) {
@@ -246,6 +251,7 @@ module.exports = class CtripFlightsPriceSpider {
           flightInfo.arrivalDate = info.arrivalDate
           flightInfo.stopInfo = info.stopInfo
           flightInfo.cabins = []
+          flightInfo.getTime = getPageRes.nowTime
           for (const ca of route.legs[0].cabins) {
             const cabin = {}
             cabin.salePrice = ca.price.salePrice
@@ -280,8 +286,10 @@ module.exports = class CtripFlightsPriceSpider {
     let res
     try {
       if(flightInfoList && flightInfoList.length > 0) {
-        const doc = new FlightInfo(flightInfoList[0])
-        res = await doc.save()
+        for (const item of flightInfoList) {
+          const doc = new FlightInfo(item)
+          res = await doc.save()
+        }
       }
     } catch (err) {
       flag = false
