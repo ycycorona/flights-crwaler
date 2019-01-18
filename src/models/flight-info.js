@@ -68,6 +68,7 @@ const cabinSchema = new Schema({
   priceClass: String,
   rate: Number,
   seatCount: Number,
+  specialClassName: String,
   refundEndorse: refundEndorseSchema
 })
 
@@ -84,6 +85,12 @@ const flightInfoSchema = new Schema({
     type: String
   },
   flightNumber: {
+    type: String
+  },
+  sharedFlightNumber: {
+    type: String
+  },
+  sharedFlightName: {
     type: String
   },
   departureAirportInfo: airportInfoSchema,

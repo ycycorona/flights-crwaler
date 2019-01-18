@@ -14,6 +14,14 @@ module.exports = {
       height: 1080
     }
   },
+  mongodb: {
+    dbUrl: 'mongodb://127.0.0.1:27017/flights-crawler',
+    obOptions: {
+      useNewUrlParser: true,
+      // user: 'flightsCrawler',
+      // pass: 'ycy6323892',
+    }
+  },
   ctripFlightsPriceSpider: {
     params: {
       baseUrl: 'https://flights.ctrip.com/itinerary/',

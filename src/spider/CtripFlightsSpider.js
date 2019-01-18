@@ -262,6 +262,12 @@ module.exports = class CtripFlightsPriceSpider {
             cabin.priceClass = ca.priceClass
             cabin.rate = ca.price.rate
             cabin.seatCount = ca.seatCount
+            if (ca.specialClass && ca.specialClass.typeName) {
+              cabin.specialClassName = ca.specialClass.typeName
+            } else {
+              cabin.specialClassName = ''
+            }
+
             //cabin.refundEndorse = ca.refundEndorse
             cabin.productInfoList = ca.productInfoList
             flightInfo.cabins.push(cabin)
