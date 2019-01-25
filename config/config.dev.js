@@ -15,11 +15,11 @@ module.exports = {
     }
   },
   mongodb: {
-    dbUrl: 'mongodb://127.0.0.1:27017/flights-crawler',
+    dbUrl: 'mongodb://47.105.46.120:27017/flights-crawler',
     obOptions: {
       useNewUrlParser: true,
-      // user: 'flightsCrawler',
-      // pass: 'ycy6323892',
+      user: 'flightsCrawler',
+      pass: 'ycy6323892',
     }
   },
   ctripFlightsPriceSpider: {
@@ -30,11 +30,10 @@ module.exports = {
       dateEnd: '2019-01-11',
       flightLines: [
         ['hrb', 'tao'],
-        /*['tao', 'hrb'],
+/*        ['tao', 'hrb'],
         ['zha', 'tao'],
         ['tao', 'zha'],
         ['kry', 'tao'],
-        ['tao', 'kry'],
         ['tao', 'kry'],
         ['zyi', 'tao'],
         ['tao', 'zyi'],
@@ -46,15 +45,9 @@ module.exports = {
         ['tao', 'bhy'],
         ['ckg', 'tao'],
         ['tao', 'ckg'],
-        ['tao', 'ckg'],
-        ['lhw', 'tao'],
-        ['tao', 'lhw'],
         ['kmg', 'tao'],
         ['tao', 'kmg'],
-        ['kwe', 'tao'],
-        ['tao', 'kwe'],
         ['kwl', 'tao'],
-        ['tao', 'kwl'],
         ['tao', 'kwl'],
         ['cgq', 'ynt'],
         ['ynt', 'cgq'],
@@ -87,7 +80,8 @@ module.exports = {
         ['nng', 'cgq'],
         ['cgq', 'nng'],
         ['hak', 'cgq'],
-        ['cgq', 'hak']*/]
+        ['cgq', 'hak']*/
+      ]
 
     }
   }
